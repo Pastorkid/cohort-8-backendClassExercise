@@ -12,16 +12,16 @@
 
 const express=require('express');
 const app=express();
+const {add}=require('./math')
+const {router}=require('./Routes/appRoute');
 
-app.get('/',(req,res)=>{
-res.send('Server is running!');
-})
-app.get('/about',(req,res)=>{
-res.send('About Us');
-})
-app.get('/contact',(req,res)=>{
-res.send('Contact Us');
-})
+app.use(router);
+
+// app.get('/',(req,res)=>{
+// res.send(`Sum of 1, 2 is ${add(1,2)}`);
+// })
+
+
 app.get('/users',(req,res)=>{
   const id=req.query.role;
 res.send(`Users ${id}`);
