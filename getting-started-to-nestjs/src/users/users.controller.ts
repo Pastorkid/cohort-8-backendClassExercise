@@ -3,6 +3,9 @@ import {
   Controller,
   Get,
   Param,
+  ParseBoolPipe,
+  ParseFloatPipe,
+  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -10,20 +13,15 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { CreateUserDto } from './dto/createUser.dto.js';
+import { ParseIntPipePipe } from './pipes/parse-int-pipe/parse-int-pipe.pipe.js';
+import { UsersService } from './users.service.js';
 
 @Controller('users')
 export class UsersController {
+  constructor(private userService: UsersService) {}
   @Get('all')
   getUsers() {
-    return [
-      {
-        id: 1,
-        name: 'Miracle Tijani',
-        email: 'miracle.tijani@example.com',
-        password: '123456',
-        role: 'admin',
-      },
-    ];
+    return this.userService.fetchUsers();
   }
 
   // @Post('create')
@@ -35,7 +33,7 @@ export class UsersController {
   @Post('create')
   createUser(@Body() userPayload: CreateUserDto) {
     console.log('userPayload', userPayload);
-    return 'create user';
+    return this.userService.createUser(userPayload);
   }
   //demostare dynamic route with express approcah
   // @Get(':id')
@@ -46,7 +44,7 @@ export class UsersController {
 
   @Get('query')
   getUserAcendingOrder(
-    @Query('asc') asc: string,
+    @Query('asc', ParseBoolPipe) asc: boolean,
     @Query('sortBy') sortBy: string,
   ) {
     console.log(asc, sortBy);
@@ -54,16 +52,16 @@ export class UsersController {
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: string) {
+  getUserById(@Param('id', ParseIntPipePipe) id: number) {
     console.log(id);
-    return `get user by id ${id}`;
+    return this.userService.findUserById(id);
   }
 
   @Get(':id/:postId/:likeId')
   getUserByIdAndPosId(
-    @Param('id') id: string,
-    @Param('postId') postId: string,
-    @Param('likeId') likeId: string,
+    @Param('id', ParseIntPipe) id: number,
+    @Param('postId', ParseIntPipe) postId: number,
+    @Param('likeId', ParseIntPipe) likeId: number,
   ) {
     console.log(id, postId, likeId);
     return `get user by id ${id} and post id ${postId} and like id ${likeId}`;
